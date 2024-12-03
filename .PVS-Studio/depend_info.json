@@ -1,0 +1,24 @@
+[
+    {
+        "arguments": [
+            "C:\\Program Files\\JetBrains\\CLion 2023.3.1\\bin\\mingw\\bin\\g++.exe",
+            "-g",
+            "-fdiagnostics-color=always",
+            "-DPVS_STUDIO",
+            "C:\\Users\\Access\\untitled27\\FileManager.cpp"
+        ],
+        "dependencies": [],
+        "id": 1
+    },
+    {
+        "arguments": [
+            "C:\\Program Files\\JetBrains\\CLion 2023.3.1\\bin\\mingw\\bin\\g++.exe",
+            "-g",
+            "-fdiagnostics-color=always",
+            "-DPVS_STUDIO",
+            "C:\\Users\\Access\\untitled27\\main.cpp"
+        ],
+        "dependencies": [],
+        "id": 2
+    }
+]
