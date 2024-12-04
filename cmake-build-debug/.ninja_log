@@ -1,9 +1,9 @@
 # ninja log v5
-1	13	0	clean	849ce62d9c46ca00
-0	673	7549527250770255	CMakeFiles/untitled27.dir/main.cpp.obj	8c29d41a59761e34
-10	722	7549527251285754	CMakeFiles/untitled27.dir/FileManager.cpp.obj	55a52082b846db62
-723	921	7549527253150685	untitled27.exe	8e1b3ed8ae57cde6
-0	20	0	clean	849ce62d9c46ca00
-5	677	7549527849896366	CMakeFiles/untitled27.dir/main.cpp.obj	8c29d41a59761e34
-12	758	7549527850684924	CMakeFiles/untitled27.dir/FileManager.cpp.obj	55a52082b846db62
-758	901	7549527852016889	untitled27.exe	8e1b3ed8ae57cde6
+14	1311	7550576518042959	CMakeFiles/assign1.dir/FileManager.cpp.obj	6dfb6041688ecb96
+19	1545	7550576520368541	CMakeFiles/assign1.dir/IndexManager.cpp.obj	c327206ae1577fc9
+8	1159	7550576516520538	CMakeFiles/assign1.dir/main.cpp.obj	b427eaba33d220a
+1545	1830	7550576523172682	assign1.exe	4e83ddba1510c370
+10	691	7550583758062258	CMakeFiles/assign1.dir/main.cpp.obj	ffbdc5fe17fbac1f
+4	873	7550583759874629	CMakeFiles/assign1.dir/FileManager.cpp.obj	bd406520cd9e751
+15	1038	7550583761511528	CMakeFiles/assign1.dir/IndexManager.cpp.obj	81c36baff34751e3
+1038	1215	7550583763240043	assign1.exe	4e83ddba1510c370
