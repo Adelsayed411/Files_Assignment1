@@ -5,7 +5,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
-
+using namespace std ;
 // Structure for Doctor data
 struct Doctor {
     int doctorID;

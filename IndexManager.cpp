@@ -93,7 +93,10 @@ vector<streampos> IndexManager::searchSecondaryIndex(const string& fileName, con
     }
     return positions;
 }
-
+void IndexManager::saveDoctorsIndex() {
+    // Write the doctors primary index to the file
+    writeIndexToFile("doctors_index.dat", doctorsPrimaryIndex);
+}
 void IndexManager::deleteIndexEntry(const string& fileName, const string& key) {
     if (fileName == "doctors.dat") {
         doctorsPrimaryIndex.erase(key);

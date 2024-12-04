@@ -11,13 +11,13 @@ using namespace std;
 
 // Primary Index structure
 struct PrimaryIndexEntry {
-    std::string key;  // Doctor ID or Appointment ID
-    std::streampos position;  // Position of the record in the data file
+    string key;  // Doctor ID or Appointment ID
+    streampos position;  // Position of the record in the data file
 };
 
 // Secondary Index structure (linked list entry)
 struct SecondaryIndexEntry {
-    std::streampos position;  // Position of the record in the data file
+    streampos position;  // Position of the record in the data file
     SecondaryIndexEntry* next;  // Pointer to the next entry in the linked list
 };
 
@@ -31,38 +31,39 @@ public:
     ~IndexManager();
 
     // Functions for primary index management
-    void createDoctorsPrimaryIndex(const std::string& fileName);
-    void createAppointmentsPrimaryIndex(const std::string& fileName);
+    void createDoctorsPrimaryIndex(const string& fileName);
+    void createAppointmentsPrimaryIndex(const string& fileName);
 
     // Functions for secondary index management
-    void createDoctorsSecondaryIndex(const std::string& fileName);
-    void createAppointmentsSecondaryIndex(const std::string& fileName);
+    void createDoctorsSecondaryIndex(const string& fileName);
+    void createAppointmentsSecondaryIndex(const string& fileName);
 
     // Add entries to the indexes
-    void addPrimaryIndexEntry(const std::string& fileName, const std::string& key, std::streampos position);
-    void addSecondaryIndexEntry(const std::string& fileName, const std::string& key, std::streampos position);
+    void addPrimaryIndexEntry(const string& fileName, const string& key, streampos position);
+    void addSecondaryIndexEntry(const string& fileName, const string& key, streampos position);
 
     // Search for an index entry by key
-    std::streampos searchPrimaryIndex(const std::string& fileName, const std::string& key);
-    std::vector<std::streampos> searchSecondaryIndex(const std::string& fileName, const std::string& key);
+    streampos searchPrimaryIndex(const string& fileName, const string& key);
+    vector<streampos> searchSecondaryIndex(const string& fileName, const string& key);
 
     // Delete an index entry
-    void deleteIndexEntry(const std::string& fileName, const std::string& key);
+    void deleteIndexEntry(const string& fileName, const string& key);
+    void saveDoctorsIndex();
 
 private:
     // Internal maps to store primary indexes
-    std::map<std::string, PrimaryIndexEntry> doctorsPrimaryIndex;
-    std::map<std::string, PrimaryIndexEntry> appointmentsPrimaryIndex;
+    map<string, PrimaryIndexEntry> doctorsPrimaryIndex;
+    map<string, PrimaryIndexEntry> appointmentsPrimaryIndex;
 
     // Internal maps to store secondary indexes (linked lists)
-    std::map<std::string, SecondaryIndexEntry*> doctorsSecondaryIndex;
-    std::map<std::string, SecondaryIndexEntry*> appointmentsSecondaryIndex;
+    map<string, SecondaryIndexEntry*> doctorsSecondaryIndex;
+    map<string, SecondaryIndexEntry*> appointmentsSecondaryIndex;
 
     // Helper functions
-    void writeIndexToFile(const std::string& fileName, const std::map<std::string, PrimaryIndexEntry>& indexMap);
-    void writeSecondaryIndexToFile(const std::string& fileName, const std::map<std::string, SecondaryIndexEntry*>& indexMap);
-    void loadIndexFromFile(const std::string& fileName, std::map<std::string, PrimaryIndexEntry>& indexMap);
-    void loadSecondaryIndexFromFile(const std::string& fileName, std::map<std::string, SecondaryIndexEntry*>& indexMap);
+    void writeIndexToFile(const string& fileName, const map<string, PrimaryIndexEntry>& indexMap);
+    void writeSecondaryIndexToFile(const string& fileName, const map<string, SecondaryIndexEntry*>& indexMap);
+    void loadIndexFromFile(const string& fileName, map<string, PrimaryIndexEntry>& indexMap);
+    void loadSecondaryIndexFromFile(const string& fileName, map<string, SecondaryIndexEntry*>& indexMap);
 };
 
 #endif // INDEXMANAGER_H

@@ -1,12 +1,23 @@
 #include "FileManager.h"
-#include "DoctorsPrimaryIndex.h"
+#include "IndexManager.h"  // Include IndexManager.h
 #include <iostream>
 #include <cstring>
+#include <fstream>
+#include <map>
 
 using namespace std;
 
+// Define the Doctor structure
+struct Doctor {
+    char doctorID[15];
+    char doctorName[30];
+    char address[30];
+};
+
+// Create an instance of IndexManager
+IndexManager indexManager;
+
 fstream doctorsFile, appointmentsFile;
-DoctorsPrimaryIndex doctorsIndex("doctors_index.dat");
 
 void openFiles() {
     doctorsFile.open("doctors.dat", ios::in | ios::out | ios::binary);
@@ -24,7 +35,7 @@ void openFiles() {
     }
 
     // Load the doctors index
-    doctorsIndex.loadIndex();
+    indexManager.createDoctorsPrimaryIndex("doctors_index.dat");
 }
 
 void closeFiles() {
@@ -32,12 +43,12 @@ void closeFiles() {
     if (appointmentsFile.is_open()) appointmentsFile.close();
 
     // Save the doctors index
-    doctorsIndex.saveIndex();
+    indexManager.saveDoctorsIndex();
 }
 
 void writeDoctorRecord(const Doctor& doctor) {
     // Check if the doctor already exists in the index
-    if (doctorsIndex.searchByDoctorID(doctor.doctorID) != -1) {
+    if (indexManager.searchPrimaryIndex("doctors.dat", doctor.doctorID) != -1) {
         cout << "Error: Doctor with ID " << doctor.doctorID << " already exists.\n";
         return;
     }
@@ -53,14 +64,14 @@ void writeDoctorRecord(const Doctor& doctor) {
     doctorsFile.write(record.c_str(), record.size());
 
     // Add the doctor to the primary index
-    doctorsIndex.addIndexEntry(doctor.doctorID, position);
+    indexManager.addPrimaryIndexEntry("doctors.dat", doctor.doctorID, position);
 }
 
 Doctor readDoctorRecord(const string& doctorID) {
     Doctor doctor;
 
     // Search for the doctor in the primary index
-    streampos position = doctorsIndex.searchByDoctorID(doctorID);
+    streampos position = indexManager.searchPrimaryIndex("doctors.dat", doctorID);
     if (position == -1) {
         cout << "Error: Doctor with ID " << doctorID << " not found.\n";
         return doctor;
@@ -83,19 +94,3 @@ Doctor readDoctorRecord(const string& doctorID) {
 }
 
 void deleteDoctorRecord(const string& doctorID) {
-    // Search for the doctor in the primary index
-    streampos position = doctorsIndex.searchByDoctorID(doctorID);
-    if (position == -1) {
-        cout << "Error: Doctor with ID " << doctorID << " not found.\n";
-        return;
-    }
-
-    // Mark the record as deleted
-    doctorsFile.seekp(position);
-    doctorsFile.write("*", 1); // Write a marker (*)
-
-    // Remove from the primary index
-    doctorsIndex.removeIndexEntry(doctorID);
-
-    cout << "Doctor with ID " << doctorID << " has been deleted.\n";
-}
