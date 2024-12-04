@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.27)
-project(untitled27)
+cmake_minimum_required(VERSION 3.24.1)
+project(2sm mo7taram)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(untitled27 main.cpp
-        Appointment.h
+add_executable(2sm mo7taram main.cpp
         Doctor.h
-        FileManager.cpp
-        FileManager.h)
+        Appointment.h
+        FileManager.h
+        FileManager.cpp)
