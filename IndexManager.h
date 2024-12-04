@@ -49,6 +49,10 @@ public:
     // Delete an index entry
     void deleteIndexEntry(const string& fileName, const string& key);
     void saveDoctorsIndex();
+     void writeIndexToFile(const string& fileName, const map<string, PrimaryIndexEntry>& indexMap);
+    void writeSecondaryIndexToFile(const string& fileName, const map<string, SecondaryIndexEntry*>& indexMap);
+    PrimaryIndex getDoctorsPrimaryIndex() const;
+    PrimaryIndex getAppointmentsPrimaryIndex() const;
 
 private:
     // Internal maps to store primary indexes
@@ -60,8 +64,7 @@ private:
     map<string, SecondaryIndexEntry*> appointmentsSecondaryIndex;
 
     // Helper functions
-    void writeIndexToFile(const string& fileName, const map<string, PrimaryIndexEntry>& indexMap);
-    void writeSecondaryIndexToFile(const string& fileName, const map<string, SecondaryIndexEntry*>& indexMap);
+   
     void loadIndexFromFile(const string& fileName, map<string, PrimaryIndexEntry>& indexMap);
     void loadSecondaryIndexFromFile(const string& fileName, map<string, SecondaryIndexEntry*>& indexMap);
 };

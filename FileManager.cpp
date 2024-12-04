@@ -1,25 +1,16 @@
 #include "FileManager.h"
-#include "IndexManager.h"  // Include IndexManager.h
+#include "IndexManager.h"
 #include <iostream>
 #include <cstring>
 #include <fstream>
-#include <map>
 
 using namespace std;
 
-// Define the Doctor structure
-struct Doctor {
-    char doctorID[15];
-    char doctorName[30];
-    char address[30];
-};
-
-// Create an instance of IndexManager
-IndexManager indexManager;
-
 fstream doctorsFile, appointmentsFile;
+IndexManager indexManager;  // Use the IndexManager class for index management
 
 void openFiles() {
+    // Open the doctors file
     doctorsFile.open("doctors.dat", ios::in | ios::out | ios::binary);
     if (!doctorsFile) {
         doctorsFile.open("doctors.dat", ios::out);
@@ -27,6 +18,7 @@ void openFiles() {
         doctorsFile.open("doctors.dat", ios::in | ios::out | ios::binary);
     }
 
+    // Open the appointments file
     appointmentsFile.open("appointments.dat", ios::in | ios::out | ios::binary);
     if (!appointmentsFile) {
         appointmentsFile.open("appointments.dat", ios::out);
@@ -34,33 +26,37 @@ void openFiles() {
         appointmentsFile.open("appointments.dat", ios::in | ios::out | ios::binary);
     }
 
-    // Load the doctors index
+    // Create indices
     indexManager.createDoctorsPrimaryIndex("doctors_index.dat");
+    indexManager.createAppointmentsPrimaryIndex("appointments_index.dat");
 }
 
 void closeFiles() {
+    // Close doctors and appointments files
     if (doctorsFile.is_open()) doctorsFile.close();
     if (appointmentsFile.is_open()) appointmentsFile.close();
 
-    // Save the doctors index
-    indexManager.saveDoctorsIndex();
+    // Save indices
+    indexManager.writeIndexToFile("doctors_index.dat", indexManager.getDoctorsPrimaryIndex());
+    indexManager.writeIndexToFile("appointments_index.dat", indexManager.getAppointmentsPrimaryIndex());
 }
 
 void writeDoctorRecord(const Doctor& doctor) {
-    // Check if the doctor already exists in the index
-    if (indexManager.searchPrimaryIndex("doctors.dat", doctor.doctorID) != -1) {
+    // Check if doctor already exists in the index
+    streampos position = indexManager.searchPrimaryIndex("doctors.dat", doctor.doctorID);
+    if (position != -1) {
         cout << "Error: Doctor with ID " << doctor.doctorID << " already exists.\n";
         return;
     }
 
-    // Prepare the record to write
+    // Prepare the doctor record to write
     string record = string(doctor.doctorID) + "|" +
                     string(doctor.doctorName) + "|" +
                     string(doctor.address) + "\n";
 
-    // Write to the end of the doctors file
+    // Write the record to the doctors file
     doctorsFile.seekp(0, ios::end);
-    streampos position = doctorsFile.tellp(); // Get the current position
+    position = doctorsFile.tellp();  // Get the current position of the file pointer
     doctorsFile.write(record.c_str(), record.size());
 
     // Add the doctor to the primary index
@@ -77,7 +73,7 @@ Doctor readDoctorRecord(const string& doctorID) {
         return doctor;
     }
 
-    // Read the record from the file
+    // Read the doctor record from the file
     doctorsFile.seekg(position);
     string record;
     getline(doctorsFile, record);
@@ -94,3 +90,30 @@ Doctor readDoctorRecord(const string& doctorID) {
 }
 
 void deleteDoctorRecord(const string& doctorID) {
+    // Search for the doctor in the primary index
+    streampos position = indexManager.searchPrimaryIndex("doctors.dat", doctorID);
+    if (position == -1) {
+        cout << "Error: Doctor with ID " << doctorID << " not found.\n";
+        return;
+    }
+
+    // Mark the record as deleted (for simplicity, just overwrite with *)
+    doctorsFile.seekp(position);
+    doctorsFile.write("*", 1);  // Write a marker to indicate deletion
+
+    // Remove the doctor from the primary index
+    indexManager.deleteIndexEntry("doctors.dat", doctorID);
+
+    cout << "Doctor with ID " << doctorID << " has been deleted.\n";
+}
+
+// Add index creation function
+void FileManager::createIndex(const std::string& filename) {
+    if (filename == "doctors.dat") {
+        // Initialize doctors index if it is not already created
+        indexManager.createDoctorsPrimaryIndex("doctors_index.dat");
+    } else if (filename == "appointments.dat") {
+        // Initialize appointments index if it is not already created
+        indexManager.createAppointmentsPrimaryIndex("appointments_index.dat");
+    }
+}
