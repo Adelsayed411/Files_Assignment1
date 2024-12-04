@@ -1,24 +1,14 @@
 #include <iostream>
-#include "FileManager.h"
+#include "FileManager.h"  // Ensure this file exists and is in the same directory or in the include path
 
 int main() {
-    openFiles();
+    // Sample code to test if FileManager is included and working
+    std::cout << "Welcome to the File Management System!" << std::endl;
 
+    // Example usage of a function from FileManager.h (you'll need to implement or modify these functions in your FileManager.cpp)
+    // FileManager fileManager;
+    fileManager.createIndex("DoctorsPrimaryIndex.dat");
 
-    Doctor doc = {"D002", "Dr. Smith", "123 Main St"};
-    writeDoctorRecord(doc);
-
-
-    Appointment app = {"A001", "2024-12-10", "D001"};
-    writeAppointmentRecord(app);
-
-
-    Doctor readDoc = readDoctorRecord(0);
-    std::cout << "Doctor ID: " << readDoc.doctorID << "\n"
-              << "Name: " << readDoc.doctorName << "\n"
-              << "Address: " << readDoc.address << "\n";
-
-
-    closeFiles();
+    std::cout << "Program finished running successfully." << std::endl;
     return 0;
 }

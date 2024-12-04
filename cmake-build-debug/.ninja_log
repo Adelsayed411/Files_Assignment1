@@ -1,9 +1,5 @@
 # ninja log v5
-1	13	0	clean	849ce62d9c46ca00
-0	673	7549527250770255	CMakeFiles/untitled27.dir/main.cpp.obj	8c29d41a59761e34
-10	722	7549527251285754	CMakeFiles/untitled27.dir/FileManager.cpp.obj	55a52082b846db62
-723	921	7549527253150685	untitled27.exe	8e1b3ed8ae57cde6
 0	20	0	clean	849ce62d9c46ca00
+758	901	7549527852016889	untitled27.exe	8e1b3ed8ae57cde6
 5	677	7549527849896366	CMakeFiles/untitled27.dir/main.cpp.obj	8c29d41a59761e34
 12	758	7549527850684924	CMakeFiles/untitled27.dir/FileManager.cpp.obj	55a52082b846db62
-758	901	7549527852016889	untitled27.exe	8e1b3ed8ae57cde6
