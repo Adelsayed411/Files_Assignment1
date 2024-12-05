@@ -1,15 +1,16 @@
-"C:\Program Files\JetBrains\CLion 2022.3\bin\cmake\win\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug "-DCMAKE_MAKE_PROGRAM=C:/Program Files/JetBrains/CLion 2022.3/bin/ninja/win/ninja.exe" -G Ninja -S "D:\FCAI\YEAR 3-1\files\mo7taram\Files_Assignment1" -B "D:\FCAI\YEAR 3-1\files\mo7taram\Files_Assignment1\cmake-build-debug"
-CMake Error: Could not find cmake module file: CMakeDeterminemo7taramCompiler.cmake
-CMake Error: Could not find cmake module file: D:/FCAI/YEAR 3-1/files/mo7taram/Files_Assignment1/cmake-build-debug/CMakeFiles/3.24.2/CMakemo7taramCompiler.cmake
-CMake Error at CMakeLists.txt:2 (project):
-  No CMAKE_mo7taram_COMPILER could be found.
-
-  Tell CMake where to find the compiler by setting the CMake cache entry
-  CMAKE_mo7taram_COMPILER to the full path to the compiler, or to the
-  compiler name if it is in the PATH.
-
-
-CMake Error: Could not find cmake module file: CMakemo7taramInformation.cmake
-CMake Error: CMAKE_mo7taram_COMPILER not set, after EnableLanguage
--- Configuring incomplete, errors occurred!
-See also "D:/FCAI/YEAR 3-1/files/mo7taram/Files_Assignment1/cmake-build-debug/CMakeFiles/CMakeOutput.log".
+"C:\Program Files\JetBrains\CLion 2023.3.1\bin\cmake\win\x64\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug "-DCMAKE_MAKE_PROGRAM=C:/Program Files/JetBrains/CLion 2023.3.1/bin/ninja/win/x64/ninja.exe" -G Ninja -S C:\Users\dell\Downloads\tab\Files_Assignment1 -B C:\Users\dell\Downloads\tab\Files_Assignment1\cmake-build-debug
+-- The C compiler identification is GNU 13.1.0
+-- The CXX compiler identification is GNU 13.1.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: C:/Program Files/JetBrains/CLion 2023.3.1/bin/mingw/bin/gcc.exe - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Program Files/JetBrains/CLion 2023.3.1/bin/mingw/bin/g++.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (3.2s)
+-- Generating done (0.0s)
+-- Build files have been written to: C:/Users/dell/Downloads/tab/Files_Assignment1/cmake-build-debug
