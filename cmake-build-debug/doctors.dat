@@ -1,25 +1,7 @@
-D001|Dr. John Smith|123 Elm St
-D002|Dr. Jane Doe|456 Oak St
-D003|Dr. Emily Johnson|789 Pine St
-D004|Dr. Michael Brown|101 Maple St
-D005|Dr. Sarah Davis|202 Birch St
-D006|Dr. James Wilson|303 Cedar St
-D007|Dr. Linda Martinez|404 Spruce St
-D008|Dr. David Lee|505 Redwood St
-D009|Dr. Maria Lopez|606 Sequoia St
-D010|Dr. William Clark|707 Fir St
-D001|Dr. Smith|123 Main St
-D002|Dr. Brown|456 Elm St
-D003|Dr. Johnson|789 Pine St
-D004|Dr. Lee|101 Maple St
-D005|Dr. White|202 Oak St
-D001|Dr. Smith|123 Main St
-D002|Dr. Brown|456 Elm St
-D003|Dr. Johnson|789 Pine St
-D004|Dr. Lee|101 Maple St
-D005|Dr. White|202 Oak St
-D001|Dr. Smith|123 Main St
-D002|Dr. Brown|456 Elm St
-D003|Dr. Johnson|789 Pine St
-D004|Dr. Lee|101 Maple St
-D005|Dr. White|202 Oak St
+*-1
+|Dr. Adams|123 Elm St
+D102|Dr. Baker|456 Oak St
+*52
+|Dr. Carter|789 Pine St
+D104|Dr. Davis|101 Maple St
+D105|Dr. Evans|202 Cedar St

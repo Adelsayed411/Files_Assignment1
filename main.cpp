@@ -1,42 +1,40 @@
 #include <iostream>
 #include "FileManager.h"
 #include <vector>
+#include <stdexcept>
 
 int main() {
     // Open files for reading and writing
     openFiles();
 
-    // Create and add multiple doctors
-    Doctor doc1 = {"D001", "Dr. Smith", "123 Main St"};
-    Doctor doc2 = {"D002", "Dr. Brown", "456 Elm St"};
-    Doctor doc3 = {"D003", "Dr. Johnson", "789 Pine St"};
-    Doctor doc4 = {"D004", "Dr. Lee", "101 Maple St"};
-    Doctor doc5 = {"D005", "Dr. White", "202 Oak St"};
+    // Create and add new doctor records
+    Doctor doctors[] = {
+            {"D101", "Dr. Adams", "123 Elm St"},
+            {"D102", "Dr. Baker", "456 Oak St"},
+            {"D103", "Dr. Carter", "789 Pine St"},
+            {"D104", "Dr. Davis", "101 Maple St"},
+            {"D105", "Dr. Evans", "202 Cedar St"}
+    };
+    for (const auto& doc : doctors) {
+        writeDoctorRecord(doc);
+    }
 
-    writeDoctorRecord(doc1);
-    writeDoctorRecord(doc2);
-    writeDoctorRecord(doc3);
-    writeDoctorRecord(doc4);
-    writeDoctorRecord(doc5);
+    // Create and add new appointment records
+    Appointment appointments[] = {
+            {"A101", "2024-12-10", "D101"},
+            {"A102", "2024-12-12", "D102"},
+            {"A103", "2024-12-14", "D103"},
+            {"A104", "2024-12-16", "D101"},
+            {"A105", "2024-12-18", "D104"},
+            {"A106", "2024-12-20", "D105"}
+    };
+    for (const auto& app : appointments) {
+        writeAppointmentRecord(app);
+    }
 
-    // Create and add multiple appointments
-    Appointment app1 = {"A001", "2024-12-10", "D001"};
-    Appointment app2 = {"A002", "2024-12-15", "D002"};
-    Appointment app3 = {"A003", "2024-12-20", "D003"};
-    Appointment app4 = {"A004", "2024-12-25", "D001"};
-    Appointment app5 = {"A005", "2024-12-30", "D004"};
-    Appointment app6 = {"A006", "2025-01-05", "D005"};
-
-    writeAppointmentRecord(app1);
-    writeAppointmentRecord(app2);
-    writeAppointmentRecord(app3);
-    writeAppointmentRecord(app4);
-    writeAppointmentRecord(app5);
-    writeAppointmentRecord(app6);
-
-    // Test search for a doctor by ID
+    // Test searching for doctors by ID
     std::cout << "\nSearching for doctors by ID:\n";
-    for (const auto& doctorID : {"D001", "D002", "D003", "D004", "D005", "D006"}) {
+    for (const auto& doctorID : {"D101", "D102", "D103", "D104", "D105", "D106"}) {
         try {
             Doctor foundDoc = searchDoctorByID(doctorID);
             std::cout << "Doctor ID: " << foundDoc.doctorID << "\n"
@@ -47,9 +45,9 @@ int main() {
         }
     }
 
-    // Test search for an appointment by ID
+    // Test searching for appointments by ID
     std::cout << "\nSearching for appointments by ID:\n";
-    for (const auto& appointmentID : {"A001", "A002", "A003", "A004", "A005", "A006", "A007"}) {
+    for (const auto& appointmentID : {"A101", "A102", "A103", "A104", "A105", "A106", "A107"}) {
         try {
             Appointment foundApp = searchAppointmentByID(appointmentID);
             std::cout << "Appointment ID: " << foundApp.appointmentID << "\n"
@@ -60,9 +58,9 @@ int main() {
         }
     }
 
-    // Test search for doctors by name
+    // Test searching for doctors by name
     std::cout << "\nSearching for doctors by name:\n";
-    for (const auto& doctorName : {"Dr. Smith", "Dr. Brown", "Dr. Johnson", "Dr. Lee", "Dr. White", "Dr. Black"}) {
+    for (const auto& doctorName : {"Dr. Adams", "Dr. Baker", "Dr. Carter", "Dr. Davis", "Dr. Evans", "Dr. Foster"}) {
         try {
             std::vector<std::streampos> positions = searchDoctorByName(doctorName);
             if (!positions.empty()) {
@@ -81,9 +79,9 @@ int main() {
         }
     }
 
-    // Test search for appointments by doctor ID
+    // Test searching for appointments by doctor ID
     std::cout << "\nSearching for appointments by doctor ID:\n";
-    for (const auto& doctorID : {"D001", "D002", "D003", "D004", "D005", "D006"}) {
+    for (const auto& doctorID : {"D101", "D102", "D103", "D104", "D105", "D106"}) {
         try {
             std::vector<std::streampos> positions = searchAppointmentsByDoctorID(doctorID);
             if (!positions.empty()) {
@@ -100,6 +98,50 @@ int main() {
         } catch (const std::runtime_error& e) {
             std::cout << "Error: " << e.what() << " for Doctor ID " << doctorID << "\n";
         }
+    }
+
+    // Test deleting multiple doctor and appointment records
+    std::cout << "\nDeleting multiple doctor and appointment records:\n";
+    try {
+        deleteDoctorRecord("D101");
+        std::cout << "Doctor D101 deleted successfully.\n";
+        deleteDoctorRecord("D103");
+        std::cout << "Doctor D103 deleted successfully.\n";
+    } catch (const std::runtime_error& e) {
+        std::cout << "Error deleting doctor: " << e.what() << "\n";
+    }
+
+    try {
+        deleteAppointmentRecord("A102");
+        std::cout << "Appointment A102 deleted successfully.\n";
+        deleteAppointmentRecord("A105");
+        std::cout << "Appointment A105 deleted successfully.\n";
+    } catch (const std::runtime_error& e) {
+        std::cout << "Error deleting appointment: " << e.what() << "\n";
+    }
+
+    // Verify if the deleted records are removed and added to avail list
+    std::cout << "\nVerifying the avail list content:\n";
+    std::ifstream availListFile("doctorAvailList.txt");
+    if (availListFile.is_open()) {
+        std::string line;
+        while (getline(availListFile, line)) {
+            std::cout << "Doctor Avail List Entry: " << line << "\n";
+        }
+        availListFile.close();
+    } else {
+        std::cout << "Unable to open doctor avail list file for verification.\n";
+    }
+
+    availListFile.open("appointmentAvailList.txt");
+    if (availListFile.is_open()) {
+        std::string line;
+        while (getline(availListFile, line)) {
+            std::cout << "Appointment Avail List Entry: " << line << "\n";
+        }
+        availListFile.close();
+    } else {
+        std::cout << "Unable to open appointment avail list file for verification.\n";
     }
 
     // Close the files after operations

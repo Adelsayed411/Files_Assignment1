@@ -1,12 +1,12 @@
-cmake_minimum_required(VERSION 3.24)
-project(assign1)
+cmake_minimum_required(VERSION 3.27)
+project(untitled25)
 
 set(CMAKE_CXX_STANDARD 17)
-include_directories(.)
 
-add_executable(assign1
-        Appointment.h
+add_executable(untitled25 main.cpp
         Doctor.h
-        FileManager.cpp
+        Appointment.h
         FileManager.h
-        main.cpp IndexManager.h IndexManager.cpp)
+        FileManager.cpp
+        IndexManager.cpp
+        IndexManager.h)

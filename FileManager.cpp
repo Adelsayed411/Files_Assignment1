@@ -1,27 +1,29 @@
 #include "FileManager.h"
 #include "IndexManager.h"
 #include <iostream>
+#include <fstream>
 #include <cstring>
 #include <sstream>
 #include <vector>
+using namespace std;
 
 // Global variables for file streams
-std::fstream doctorsFile, appointmentsFile;
+fstream doctorsFile, appointmentsFile;
 
 // Function to open files
 void openFiles() {
-    doctorsFile.open("doctors.dat", std::ios::in | std::ios::out | std::ios::binary);
+    doctorsFile.open("doctors.dat", ios::in | ios::out | ios::binary);
     if (!doctorsFile) {
-        doctorsFile.open("doctors.dat", std::ios::out);
+        doctorsFile.open("doctors.dat", ios::out);
         doctorsFile.close();
-        doctorsFile.open("doctors.dat", std::ios::in | std::ios::out | std::ios::binary);
+        doctorsFile.open("doctors.dat", ios::in | ios::out | ios::binary);
     }
 
-    appointmentsFile.open("appointments.dat", std::ios::in | std::ios::out | std::ios::binary);
+    appointmentsFile.open("appointments.dat", ios::in | ios::out | ios::binary);
     if (!appointmentsFile) {
-        appointmentsFile.open("appointments.dat", std::ios::out);
+        appointmentsFile.open("appointments.dat", ios::out);
         appointmentsFile.close();
-        appointmentsFile.open("appointments.dat", std::ios::in | std::ios::out | std::ios::binary);
+        appointmentsFile.open("appointments.dat", ios::in | ios::out | ios::binary);
     }
 
     // Open and load index files using IndexManager
@@ -39,12 +41,12 @@ void closeFiles() {
 
 // Function to write a doctor record
 void writeDoctorRecord(const Doctor& doctor) {
-    doctorsFile.seekp(0, std::ios::end);
-    std::streampos position = doctorsFile.tellp();
+    doctorsFile.seekp(0, ios::end);
+    streampos position = doctorsFile.tellp();
 
-    std::string record = std::string(doctor.doctorID) + "|" +
-                         std::string(doctor.doctorName) + "|" +
-                         std::string(doctor.address) + "\n";
+    string record = string(doctor.doctorID) + "|" +
+                    string(doctor.doctorName) + "|" +
+                    string(doctor.address) + "\n";
 
     doctorsFile.write(record.c_str(), record.size());
     IndexManager::addDoctorToIndexFile(doctor, position);
@@ -52,76 +54,76 @@ void writeDoctorRecord(const Doctor& doctor) {
 
 // Function to write an appointment record
 void writeAppointmentRecord(const Appointment& appointment) {
-    appointmentsFile.seekp(0, std::ios::end);
-    std::streampos position = appointmentsFile.tellp();
+    appointmentsFile.seekp(0, ios::end);
+    streampos position = appointmentsFile.tellp();
 
-    std::string record = std::string(appointment.appointmentID) + "|" +
-                         std::string(appointment.appointmentDate) + "|" +
-                         std::string(appointment.doctorID) + "\n";
+    string record = string(appointment.appointmentID) + "|" +
+                    string(appointment.appointmentDate) + "|" +
+                    string(appointment.doctorID) + "\n";
 
     appointmentsFile.write(record.c_str(), record.size());
     IndexManager::addAppointmentToIndexFile(appointment, position);
 }
 
 // Function to read a doctor record from a specific position
-Doctor readDoctorRecord(std::streampos position) {
+Doctor readDoctorRecord(streampos position) {
     Doctor doctor;
-    std::string record;
+    string record;
     doctorsFile.seekg(position);
-    std::getline(doctorsFile, record);
+    getline(doctorsFile, record);
 
     size_t pos1 = record.find('|');
     size_t pos2 = record.find('|', pos1 + 1);
 
-    std::strncpy(doctor.doctorID, record.substr(0, pos1).c_str(), 15);
-    std::strncpy(doctor.doctorName, record.substr(pos1 + 1, pos2 - pos1 - 1).c_str(), 30);
-    std::strncpy(doctor.address, record.substr(pos2 + 1).c_str(), 30);
+    strncpy(doctor.doctorID, record.substr(0, pos1).c_str(), 15);
+    strncpy(doctor.doctorName, record.substr(pos1 + 1, pos2 - pos1 - 1).c_str(), 30);
+    strncpy(doctor.address, record.substr(pos2 + 1).c_str(), 30);
 
     return doctor;
 }
 
 // Function to read an appointment record from a specific position
-Appointment readAppointmentRecord(std::streampos position) {
+Appointment readAppointmentRecord(streampos position) {
     Appointment appointment;
-    std::string record;
+    string record;
     appointmentsFile.seekg(position);
-    std::getline(appointmentsFile, record);
+    getline(appointmentsFile, record);
 
     size_t pos1 = record.find('|');
     size_t pos2 = record.find('|', pos1 + 1);
 
-    std::strncpy(appointment.appointmentID, record.substr(0, pos1).c_str(), 15);
-    std::strncpy(appointment.appointmentDate, record.substr(pos1 + 1, pos2 - pos1 - 1).c_str(), 30);
-    std::strncpy(appointment.doctorID, record.substr(pos2 + 1).c_str(), 15);
+    strncpy(appointment.appointmentID, record.substr(0, pos1).c_str(), 15);
+    strncpy(appointment.appointmentDate, record.substr(pos1 + 1, pos2 - pos1 - 1).c_str(), 30);
+    strncpy(appointment.doctorID, record.substr(pos2 + 1).c_str(), 15);
 
     return appointment;
 }
 
 // Function to search for a doctor by ID using the primary index
-Doctor searchDoctorByID(const std::string& doctorID) {
+Doctor searchDoctorByID(const string& doctorID) {
     const auto& doctorPrimaryIndex = IndexManager::getDoctorPrimaryIndex();
     auto it = doctorPrimaryIndex.find(doctorID);
     if (it != doctorPrimaryIndex.end()) {
         return readDoctorRecord(it->second);
     } else {
-        throw std::runtime_error("Doctor ID not found");
+        throw runtime_error("Doctor ID not found");
     }
 }
 
 // Function to search for an appointment by ID using the primary index
-Appointment searchAppointmentByID(const std::string& appointmentID) {
+Appointment searchAppointmentByID(const string& appointmentID) {
     const auto& appointmentPrimaryIndex = IndexManager::getAppointmentPrimaryIndex();
     auto it = appointmentPrimaryIndex.find(appointmentID);
     if (it != appointmentPrimaryIndex.end()) {
         return readAppointmentRecord(it->second);
     } else {
-        throw std::runtime_error("Appointment ID not found");
+        throw runtime_error("Appointment ID not found");
     }
 }
 
 // Function to search for doctors by name using the secondary index
-std::vector<std::streampos> searchDoctorByName(const std::string& doctorName) {
-    std::vector<std::streampos> positions;
+vector<streampos> searchDoctorByName(const string& doctorName) {
+    vector<streampos> positions;
     const auto& doctorNameSecondaryIndex = IndexManager::getDoctorNameSecondaryIndex();
 
     auto it = doctorNameSecondaryIndex.find(doctorName);
@@ -133,15 +135,15 @@ std::vector<std::streampos> searchDoctorByName(const std::string& doctorName) {
             }
         }
     } else {
-        throw std::runtime_error("Doctor name not found");
+        throw runtime_error("Doctor name not found");
     }
 
     return positions;
 }
 
 // Function to search for appointments by doctor ID using the secondary index
-std::vector<std::streampos> searchAppointmentsByDoctorID(const std::string& doctorID) {
-    std::vector<std::streampos> positions;
+vector<streampos> searchAppointmentsByDoctorID(const string& doctorID) {
+    vector<streampos> positions;
     const auto& doctorIDSecondaryIndex = IndexManager::getDoctorIDSecondaryIndex();
 
     auto it = doctorIDSecondaryIndex.find(doctorID);
@@ -153,8 +155,80 @@ std::vector<std::streampos> searchAppointmentsByDoctorID(const std::string& doct
             }
         }
     } else {
-        throw std::runtime_error("Doctor ID not found in appointments");
+        throw runtime_error("Doctor ID not found in appointments");
     }
 
     return positions;
 }
+
+#include <stdexcept>
+
+// Flag to track if the first deletion has occurred
+bool firstDoctorDeletion = true;
+bool firstAppointmentDeletion = true;
+
+// Function to delete a doctor record and update the index and avail list
+void deleteDoctorRecord(const std::string& doctorID) {
+    const auto& doctorPrimaryIndex = IndexManager::getDoctorPrimaryIndex();
+    auto it = doctorPrimaryIndex.find(doctorID);
+    if (it != doctorPrimaryIndex.end()) {
+        std::streampos position = it->second;
+
+        // Calculate the size of the record
+        doctorsFile.seekg(position);
+        std::string record;
+        std::getline(doctorsFile, record);
+        size_t size = record.size() + 1;  // Include newline character
+
+        // Mark the record as deleted in the data file
+        doctorsFile.seekp(position);
+        if (firstDoctorDeletion) {
+            doctorsFile << "*-1\n";  // Marking the first deleted record
+            firstDoctorDeletion = false;
+        } else {
+            doctorsFile << "*" << position << "\n";  // Mark subsequent deletions with offset
+        }
+
+        // Remove from indexes and add to avail list
+        IndexManager::removeDoctorFromIndexFile(doctorID);
+        IndexManager::addToAvailList("doctor", position, size);
+
+        std::cout << "Doctor record with ID " << doctorID << " marked as deleted.\n";
+    } else {
+        std::cout << "Doctor ID " << doctorID << " not found.\n";
+    }
+}
+
+// Function to delete an appointment record and update the index and avail list
+void deleteAppointmentRecord(const std::string& appointmentID) {
+    const auto& appointmentPrimaryIndex = IndexManager::getAppointmentPrimaryIndex();
+    auto it = appointmentPrimaryIndex.find(appointmentID);
+    if (it != appointmentPrimaryIndex.end()) {
+        std::streampos position = it->second;
+
+        // Calculate the size of the record
+        appointmentsFile.seekg(position);
+        std::string record;
+        std::getline(appointmentsFile, record);
+        size_t size = record.size() + 1;  // Include newline character
+
+        // Mark the record as deleted in the data file
+        appointmentsFile.seekp(position);
+        if (firstAppointmentDeletion) {
+            appointmentsFile << "*-1\n";  // Marking the first deleted record
+            firstAppointmentDeletion = false;
+        } else {
+            appointmentsFile << "*" << position << "\n";  // Mark subsequent deletions with offset
+        }
+
+        // Remove from indexes and add to avail list
+        IndexManager::removeAppointmentFromIndexFile(appointmentID);
+        IndexManager::addToAvailList("appointment", position, size);
+
+        std::cout << "Appointment record with ID " << appointmentID << " marked as deleted.\n";
+    } else {
+        std::cout << "Appointment ID " << appointmentID << " not found.\n";
+    }
+}
+
+

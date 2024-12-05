@@ -7,18 +7,29 @@
 #include <vector>
 #include "Doctor.h"
 #include "Appointment.h"
-#include "IndexManager.h" // Include IndexManager for search functionality
+#include "IndexManager.h"
+using namespace std;
 
+// File management functions
 void openFiles();
 void closeFiles();
 void writeDoctorRecord(const Doctor& doctor);
-Doctor readDoctorRecord(std::streampos position);
+Doctor readDoctorRecord(streampos position);
 void writeAppointmentRecord(const Appointment& appointment);
-Appointment readAppointmentRecord(std::streampos position);
+Appointment readAppointmentRecord(streampos position);
 
-Doctor searchDoctorByID(const std::string& doctorID);
-Appointment searchAppointmentByID(const std::string& appointmentID);
-std::vector<std::streampos> searchDoctorByName(const std::string& doctorName);
-std::vector<std::streampos> searchAppointmentsByDoctorID(const std::string& doctorID);
+// Search functions
+Doctor searchDoctorByID(const string& doctorID);
+Appointment searchAppointmentByID(const string& appointmentID);
+vector<streampos> searchDoctorByName(const string& doctorName);
+vector<streampos> searchAppointmentsByDoctorID(const string& doctorID);
+
+// AVAIL LIST management functions
+void addToAvailList(streampos position, size_t recordSize);
+bool getAvailPositionAndSize(size_t recordSize, streampos& position);
+
+// Delete functions
+void deleteDoctorRecord(const string& doctorID);
+void deleteAppointmentRecord(const string& appointmentID);
 
 #endif // UNTITLED25_FILEMANAGER_H
