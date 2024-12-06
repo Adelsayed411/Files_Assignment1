@@ -6,7 +6,6 @@
 int main() {
     // Open files for reading and writing
     openFiles();
-
     // Create and add new doctor records
     Doctor doctors[] = {
             {"D101", "Dr. Adams", "123 Elm St"},
