@@ -8,6 +8,7 @@
 #include "Doctor.h"
 #include "Appointment.h"
 #include "IndexManager.h"
+
 using namespace std;
 
 // File management functions
@@ -24,12 +25,19 @@ Appointment searchAppointmentByID(const string& appointmentID);
 vector<streampos> searchDoctorByName(const string& doctorName);
 vector<streampos> searchAppointmentsByDoctorID(const string& doctorID);
 
-// AVAIL LIST management functions
-void addToAvailList(streampos position, size_t recordSize);
-bool getAvailPositionAndSize(size_t recordSize, streampos& position);
+// Add new records using Best-Fit Strategy
+void addDoctorRecord(const Doctor& doctor);
+void addAppointmentRecord(const Appointment& appointment);
 
 // Delete functions
 void deleteDoctorRecord(const string& doctorID);
 void deleteAppointmentRecord(const string& appointmentID);
+
+// Update functions
+void updateDoctorRecord(const string& doctorID, const string& newDoctorName, const string& newAddress);
+void updateAppointmentRecord(const string& appointmentID, const string& newAppointmentDate);
+
+// Query processing function
+void processQuery(const string& query);
 
 #endif // UNTITLED25_FILEMANAGER_H

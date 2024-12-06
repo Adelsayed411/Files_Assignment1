@@ -163,72 +163,304 @@ vector<streampos> searchAppointmentsByDoctorID(const string& doctorID) {
 
 #include <stdexcept>
 
-// Flag to track if the first deletion has occurred
 bool firstDoctorDeletion = true;
 bool firstAppointmentDeletion = true;
 
-// Function to delete a doctor record and update the index and avail list
-void deleteDoctorRecord(const std::string& doctorID) {
+void deleteDoctorRecord(const string& doctorID) {
     const auto& doctorPrimaryIndex = IndexManager::getDoctorPrimaryIndex();
     auto it = doctorPrimaryIndex.find(doctorID);
     if (it != doctorPrimaryIndex.end()) {
-        std::streampos position = it->second;
+        streampos position = it->second;
 
-        // Calculate the size of the record
         doctorsFile.seekg(position);
-        std::string record;
-        std::getline(doctorsFile, record);
-        size_t size = record.size() + 1;  // Include newline character
+        string record;
+        getline(doctorsFile, record);
+        size_t size = record.size() + 1;
 
-        // Mark the record as deleted in the data file
         doctorsFile.seekp(position);
         if (firstDoctorDeletion) {
-            doctorsFile << "*-1\n";  // Marking the first deleted record
+            doctorsFile << "*-1\n";  
             firstDoctorDeletion = false;
         } else {
-            doctorsFile << "*" << position << "\n";  // Mark subsequent deletions with offset
+            doctorsFile << "*" << position << "\n"; 
         }
 
-        // Remove from indexes and add to avail list
         IndexManager::removeDoctorFromIndexFile(doctorID);
         IndexManager::addToAvailList("doctor", position, size);
 
-        std::cout << "Doctor record with ID " << doctorID << " marked as deleted.\n";
+        cout << "Doctor record with ID " << doctorID << " marked as deleted.\n";
     } else {
-        std::cout << "Doctor ID " << doctorID << " not found.\n";
+        cout << "Doctor ID " << doctorID << " not found.\n";
     }
 }
 
-// Function to delete an appointment record and update the index and avail list
-void deleteAppointmentRecord(const std::string& appointmentID) {
+void deleteAppointmentRecord(const string& appointmentID) {
     const auto& appointmentPrimaryIndex = IndexManager::getAppointmentPrimaryIndex();
     auto it = appointmentPrimaryIndex.find(appointmentID);
     if (it != appointmentPrimaryIndex.end()) {
-        std::streampos position = it->second;
+        streampos position = it->second;
 
-        // Calculate the size of the record
         appointmentsFile.seekg(position);
-        std::string record;
-        std::getline(appointmentsFile, record);
-        size_t size = record.size() + 1;  // Include newline character
+        string record;
+        getline(appointmentsFile, record);
+        size_t size = record.size() + 1;  
 
-        // Mark the record as deleted in the data file
         appointmentsFile.seekp(position);
         if (firstAppointmentDeletion) {
-            appointmentsFile << "*-1\n";  // Marking the first deleted record
+            appointmentsFile << "*-1\n";
             firstAppointmentDeletion = false;
         } else {
-            appointmentsFile << "*" << position << "\n";  // Mark subsequent deletions with offset
+            appointmentsFile << "*" << position << "\n";  
         }
 
-        // Remove from indexes and add to avail list
         IndexManager::removeAppointmentFromIndexFile(appointmentID);
         IndexManager::addToAvailList("appointment", position, size);
 
-        std::cout << "Appointment record with ID " << appointmentID << " marked as deleted.\n";
+        cout << "Appointment record with ID " << appointmentID << " marked as deleted.\n";
     } else {
-        std::cout << "Appointment ID " << appointmentID << " not found.\n";
+        cout << "Appointment ID " << appointmentID << " not found.\n";
     }
 }
 
 
+#include <algorithm>
+
+// Function to add a doctor record with best-fit placement strategy
+void addDoctorRecord(const Doctor& doctor) {
+    const auto& doctorPrimaryIndex = IndexManager::getDoctorPrimaryIndex();
+    if (doctorPrimaryIndex.find(doctor.doctorID) != doctorPrimaryIndex.end()) {
+        throw runtime_error("Duplicate Doctor ID is not allowed: " + string(doctor.doctorID));
+    }
+
+    ostringstream recordStream;
+    recordStream << doctor.doctorID << "|" << doctor.doctorName << "|" << doctor.address << "\n";
+    string record = recordStream.str();
+    size_t recordSize = record.size();
+
+    auto& availList = IndexManager::doctorAvailList; 
+    sort(availList.begin(), availList.end(), [](const auto& a, const auto& b) {
+        return a.second < b.second; 
+    });
+
+    streampos position;
+    bool recordPlaced = false;
+
+    for (auto it = availList.begin(); it != availList.end(); ++it) {
+        if (it->second >= recordSize) {
+      
+            position = it->first;
+            doctorsFile.seekp(position);
+            doctorsFile.write(record.c_str(), recordSize);
+
+            availList.erase(it);
+            recordPlaced = true;
+            break;
+        }
+    }
+
+    if (!recordPlaced) {
+        doctorsFile.seekp(0, ios::end);
+        position = doctorsFile.tellp();
+        doctorsFile.write(record.c_str(), recordSize);
+    }
+
+    IndexManager::addDoctorToIndexFile(doctor, position);
+
+    if (availList.size() == 1) {
+        auto lastDeleted = availList.front();
+        doctorsFile.seekp(lastDeleted.first);
+        doctorsFile << "*-1\n";
+    }
+
+    IndexManager::writeAvailListFiles();
+}
+
+// Function to add an appointment record with best-fit placement strategy
+void addAppointmentRecord(const Appointment& appointment) {
+ 
+    const auto& appointmentPrimaryIndex = IndexManager::getAppointmentPrimaryIndex();
+    if (appointmentPrimaryIndex.find(appointment.appointmentID) != appointmentPrimaryIndex.end()) {
+        throw runtime_error("Duplicate Appointment ID is not allowed: " + string(appointment.appointmentID));
+    }
+
+    ostringstream recordStream;
+    recordStream << appointment.appointmentID << "|" << appointment.appointmentDate << "|" << appointment.doctorID << "\n";
+    string record = recordStream.str();
+    size_t recordSize = record.size();
+
+    auto& availList = IndexManager::appointmentAvailList; 
+    sort(availList.begin(), availList.end(), [](const auto& a, const auto& b) {
+        return a.second < b.second; 
+    });
+
+    streampos position;
+    bool recordPlaced = false;
+
+    for (auto it = availList.begin(); it != availList.end(); ++it) {
+        if (it->second >= recordSize) {
+           
+            position = it->first;
+
+            appointmentsFile.seekp(position);
+            appointmentsFile.write(record.c_str(), recordSize);
+
+            availList.erase(it);
+            recordPlaced = true;
+            break;
+        }
+    }
+
+    if (!recordPlaced) {
+        appointmentsFile.seekp(0, ios::end);
+        position = appointmentsFile.tellp();
+        appointmentsFile.write(record.c_str(), recordSize);
+    }
+
+    IndexManager::addAppointmentToIndexFile(appointment, position);
+
+    if (availList.size() == 1) {
+        auto lastDeleted = availList.front();
+        appointmentsFile.seekp(lastDeleted.first);
+        appointmentsFile << "*-1\n";
+    }
+
+    IndexManager::writeAvailListFiles();
+}
+
+void updateDoctorRecord(const string& doctorID, const string& newDoctorName, const string& newAddress) {
+
+    const auto& doctorPrimaryIndex = IndexManager::getDoctorPrimaryIndex();
+    auto it = doctorPrimaryIndex.find(doctorID);
+
+    if (it == doctorPrimaryIndex.end()) {
+        throw runtime_error("Doctor ID not found: " + doctorID);
+    }
+
+    streampos position = it->second;
+
+    doctorsFile.seekg(position);
+    string record;
+    getline(doctorsFile, record);
+
+    size_t pos1 = record.find('|');
+    size_t pos2 = record.find('|', pos1 + 1);
+
+    if (pos1 == string::npos || pos2 == string::npos) {
+        throw runtime_error("Corrupt record format for Doctor ID: " + doctorID);
+    }
+
+    string currentDoctorName = record.substr(pos1 + 1, pos2 - pos1 - 1);
+    string currentAddress = record.substr(pos2 + 1);
+
+    string updatedDoctorName = newDoctorName.substr(0, 30); 
+    string updatedAddress = newAddress.substr(0, 30);       
+
+    ostringstream updatedRecordStream;
+    updatedRecordStream << doctorID << "|" << updatedDoctorName << "|" << updatedAddress << "\n";
+    string updatedRecord = updatedRecordStream.str();
+
+    doctorsFile.seekp(position);
+    doctorsFile.write(updatedRecord.c_str(), updatedRecord.size());
+
+    if (currentDoctorName != updatedDoctorName) {
+        IndexManager::removeDoctorFromIndexFile(doctorID); 
+        Doctor updatedDoctor = {0}; 
+        strncpy(updatedDoctor.doctorID, doctorID.c_str(), 15);
+        strncpy(updatedDoctor.doctorName, updatedDoctorName.c_str(), 30);
+        strncpy(updatedDoctor.address, updatedAddress.c_str(), 30);
+        IndexManager::addDoctorToIndexFile(updatedDoctor, position); 
+    }
+
+    cout << "Doctor record with ID " << doctorID << " updated successfully.\n";
+}
+void updateAppointmentRecord(const string& appointmentID, const string& newAppointmentDate) {
+    const auto& appointmentPrimaryIndex = IndexManager::getAppointmentPrimaryIndex();
+    auto it = appointmentPrimaryIndex.find(appointmentID);
+
+    if (it == appointmentPrimaryIndex.end()) {
+        throw runtime_error("Appointment ID not found: " + appointmentID);
+    }
+
+    streampos position = it->second;
+
+    appointmentsFile.seekg(position);
+    string record;
+    getline(appointmentsFile, record);
+
+    size_t pos1 = record.find('|');
+    size_t pos2 = record.find('|', pos1 + 1);
+
+    if (pos1 == string::npos || pos2 == string::npos) {
+        throw runtime_error("Corrupt record format for Appointment ID: " + appointmentID);
+    }
+
+    string currentAppointmentDate = record.substr(pos1 + 1, pos2 - pos1 - 1);
+    string doctorID = record.substr(pos2 + 1);
+
+    string updatedAppointmentDate = newAppointmentDate.substr(0, 30); 
+
+    ostringstream updatedRecordStream;
+    updatedRecordStream << appointmentID << "|" << updatedAppointmentDate << "|" << doctorID << "\n";
+    string updatedRecord = updatedRecordStream.str();
+
+    appointmentsFile.seekp(position);
+    appointmentsFile.write(updatedRecord.c_str(), updatedRecord.size());
+
+    cout << "Appointment record with ID " << appointmentID << " updated successfully.\n";
+}
+
+#include <regex>
+// Function to process and execute user queries using regex
+void processQuery(const string& query) {
+    // Regular expressions for query validation
+    regex selectAllFromDoctorsRegex(R"(SELECT\s+ALL\s+FROM\s+DOCTORS\s+WHERE\s+DOCTOR\s+ID\s*=\s*'(.*?)';)", regex::icase);
+    regex selectAllFromAppointmentsRegex(R"(SELECT\s+ALL\s+FROM\s+APPOINTMENTS\s+WHERE\s+DOCTOR\s+ID\s*=\s*'(.*?)';)", regex::icase);
+    regex selectDoctorNameFromDoctorsRegex(R"(SELECT\s+DOCTOR\s+NAME\s+FROM\s+DOCTORS\s+WHERE\s+DOCTOR\s+ID\s*=\s*'(.*?)';)", regex::icase);
+
+    smatch match;
+
+    // Check for "SELECT ALL FROM DOCTORS WHERE DOCTOR ID='xxx';"
+    if (regex_match(query, match, selectAllFromDoctorsRegex)) {
+        string doctorID = match[1].str();
+        try {
+            Doctor doctor = searchDoctorByID(doctorID);
+            cout << "Doctor ID: " << doctor.doctorID << "\n"
+                      << "Name: " << doctor.doctorName << "\n"
+                      << "Address: " << doctor.address << "\n";
+        } catch (const runtime_error& e) {
+            cout << "Error: " << e.what() << " for Doctor ID " << doctorID << "\n";
+        }
+        return;
+    }
+
+    // Check for "SELECT ALL FROM APPOINTMENTS WHERE DOCTOR ID='xxx';"
+    if (regex_match(query, match, selectAllFromAppointmentsRegex)) {
+        string doctorID = match[1].str();
+        try {
+            vector<streampos> positions = searchAppointmentsByDoctorID(doctorID);
+            for (const auto& pos : positions) {
+                Appointment appointment = readAppointmentRecord(pos);
+                cout << "Appointment ID: " << appointment.appointmentID << "\n"
+                          << "Date: " << appointment.appointmentDate << "\n"
+                          << "Doctor ID: " << appointment.doctorID << "\n";
+            }
+        } catch (const runtime_error& e) {
+            cout << "Error: " << e.what() << " for Doctor ID " << doctorID << "\n";
+        }
+        return;
+    }
+
+    // Check for "SELECT DOCTOR NAME FROM DOCTORS WHERE DOCTOR ID='xxx';"
+    if (regex_match(query, match, selectDoctorNameFromDoctorsRegex)) {
+        string doctorID = match[1].str();
+        try {
+            Doctor doctor = searchDoctorByID(doctorID);
+            cout << "Doctor Name: " << doctor.doctorName << "\n";
+        } catch (const runtime_error& e) {
+            cout << "Error: " << e.what() << " for Doctor ID " << doctorID << "\n";
+        }
+        return;
+    }
+
+    cout << "Invalid query format.\n";
+}

@@ -6,7 +6,7 @@
 #include <list>
 #include <string>
 #include <vector>
-#include <utility> // For std::pair
+#include <utility> 
 #include "Doctor.h"
 #include "Appointment.h"
 
@@ -14,40 +14,41 @@ class IndexManager {
 public:
     static void openIndexFiles();
     static void closeIndexFiles();
-    static void addDoctorToIndexFile(const Doctor& doctor, std::streampos position);
-    static void addAppointmentToIndexFile(const Appointment& appointment, std::streampos position);
+    static void addDoctorToIndexFile(const Doctor& doctor, streampos position);
+    static void addAppointmentToIndexFile(const Appointment& appointment, streampos position);
     static void writeIndexFile();
     static void readIndexFile();
 
-    static const std::map<std::string, std::streampos>& getDoctorPrimaryIndex();
-    static const std::map<std::string, std::streampos>& getAppointmentPrimaryIndex();
-    static const std::map<std::string, std::list<std::string>>& getDoctorNameSecondaryIndex();
-    static const std::map<std::string, std::list<std::string>>& getDoctorIDSecondaryIndex();
+    static const map<string, streampos>& getDoctorPrimaryIndex();
+    static const map<string, streampos>& getAppointmentPrimaryIndex();
+    static const map<string, list<string>>& getDoctorNameSecondaryIndex();
+    static const map<string, list<string>>& getDoctorIDSecondaryIndex();
 
     // New functions to remove records from indexes
-    static void removeDoctorFromIndexFile(const std::string& doctorID);
-    static void removeAppointmentFromIndexFile(const std::string& appointmentID);
+    static void removeDoctorFromIndexFile(const string& doctorID);
+    static void removeAppointmentFromIndexFile(const string& appointmentID);
 
     // New functions to manage the avail list
-    static void addToAvailList(const std::string& recordType, std::streampos position, size_t size);
-    static std::vector<std::pair<std::streampos, size_t>> getAvailList(const std::string& recordType);
+    static void addToAvailList(const string& recordType, streampos position, size_t size);
+    static vector<pair<streampos, size_t>> getAvailList(const string& recordType);
     static void writeAvailListFiles();
     static void readAvailListFiles();
 
-private:
-    static std::ofstream doctorPrimaryIndexFile;
-    static std::ofstream appointmentPrimaryIndexFile;
-    static std::ofstream doctorNameSecondaryIndexFile;
-    static std::ofstream appointmentDoctorIDSecondaryIndexFile;
-
-    static std::map<std::string, std::streampos> doctorPrimaryIndex;
-    static std::map<std::string, std::streampos> appointmentPrimaryIndex;
-    static std::map<std::string, std::list<std::string>> doctorNameSecondaryIndex;
-    static std::map<std::string, std::list<std::string>> doctorIDSecondaryIndex;
-
     // New member variables for avail lists
-    static std::vector<std::pair<std::streampos, size_t>> doctorAvailList;
-    static std::vector<std::pair<std::streampos, size_t>> appointmentAvailList;
+    static vector<pair<streampos, size_t>> doctorAvailList;
+    static vector<pair<streampos, size_t>> appointmentAvailList;
+
+
+private:
+    static ofstream doctorPrimaryIndexFile;
+    static ofstream appointmentPrimaryIndexFile;
+    static ofstream doctorNameSecondaryIndexFile;
+    static ofstream appointmentDoctorIDSecondaryIndexFile;
+
+    static map<string, streampos> doctorPrimaryIndex;
+    static map<string, streampos> appointmentPrimaryIndex;
+    static map<string, list<string>> doctorNameSecondaryIndex;
+    static map<string, list<string>> doctorIDSecondaryIndex;
 
     static void writePrimaryIndexFile();
     static void writeSecondaryIndexFiles();
