@@ -8,6 +8,7 @@
 #include "Doctor.h"
 #include "Appointment.h"
 #include "IndexManager.h"
+
 using namespace std;
 
 // File management functions
@@ -31,5 +32,9 @@ void addAppointmentRecord(const Appointment& appointment);
 // Delete functions
 void deleteDoctorRecord(const string& doctorID);
 void deleteAppointmentRecord(const string& appointmentID);
+
+// Update functions
+void updateDoctorRecord(const string& doctorID, const string& newDoctorName, const string& newAddress);
+void updateAppointmentRecord(const string& appointmentID, const string& newAppointmentDate);
 
 #endif // UNTITLED25_FILEMANAGER_H

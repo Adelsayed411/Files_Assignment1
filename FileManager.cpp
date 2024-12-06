@@ -327,6 +327,88 @@ void addAppointmentRecord(const Appointment& appointment) {
     IndexManager::writeAvailListFiles();
 }
 
+void updateDoctorRecord(const string& doctorID, const string& newDoctorName, const string& newAddress) {
+
+    const auto& doctorPrimaryIndex = IndexManager::getDoctorPrimaryIndex();
+    auto it = doctorPrimaryIndex.find(doctorID);
+
+    if (it == doctorPrimaryIndex.end()) {
+        throw runtime_error("Doctor ID not found: " + doctorID);
+    }
+
+    streampos position = it->second;
+
+    doctorsFile.seekg(position);
+    string record;
+    getline(doctorsFile, record);
+
+    size_t pos1 = record.find('|');
+    size_t pos2 = record.find('|', pos1 + 1);
+
+    if (pos1 == string::npos || pos2 == string::npos) {
+        throw runtime_error("Corrupt record format for Doctor ID: " + doctorID);
+    }
+
+    string currentDoctorName = record.substr(pos1 + 1, pos2 - pos1 - 1);
+    string currentAddress = record.substr(pos2 + 1);
+
+    string updatedDoctorName = newDoctorName.substr(0, 30); 
+    string updatedAddress = newAddress.substr(0, 30);       
+
+    ostringstream updatedRecordStream;
+    updatedRecordStream << doctorID << "|" << updatedDoctorName << "|" << updatedAddress << "\n";
+    string updatedRecord = updatedRecordStream.str();
+
+    doctorsFile.seekp(position);
+    doctorsFile.write(updatedRecord.c_str(), updatedRecord.size());
+
+    if (currentDoctorName != updatedDoctorName) {
+        IndexManager::removeDoctorFromIndexFile(doctorID); 
+        Doctor updatedDoctor = {0}; 
+        strncpy(updatedDoctor.doctorID, doctorID.c_str(), 15);
+        strncpy(updatedDoctor.doctorName, updatedDoctorName.c_str(), 30);
+        strncpy(updatedDoctor.address, updatedAddress.c_str(), 30);
+        IndexManager::addDoctorToIndexFile(updatedDoctor, position); 
+    }
+
+    cout << "Doctor record with ID " << doctorID << " updated successfully.\n";
+}
+void updateAppointmentRecord(const string& appointmentID, const string& newAppointmentDate) {
+    const auto& appointmentPrimaryIndex = IndexManager::getAppointmentPrimaryIndex();
+    auto it = appointmentPrimaryIndex.find(appointmentID);
+
+    if (it == appointmentPrimaryIndex.end()) {
+        throw runtime_error("Appointment ID not found: " + appointmentID);
+    }
+
+    streampos position = it->second;
+
+    appointmentsFile.seekg(position);
+    string record;
+    getline(appointmentsFile, record);
+
+    size_t pos1 = record.find('|');
+    size_t pos2 = record.find('|', pos1 + 1);
+
+    if (pos1 == string::npos || pos2 == string::npos) {
+        throw runtime_error("Corrupt record format for Appointment ID: " + appointmentID);
+    }
+
+    string currentAppointmentDate = record.substr(pos1 + 1, pos2 - pos1 - 1);
+    string doctorID = record.substr(pos2 + 1);
+
+    string updatedAppointmentDate = newAppointmentDate.substr(0, 30); 
+
+    ostringstream updatedRecordStream;
+    updatedRecordStream << appointmentID << "|" << updatedAppointmentDate << "|" << doctorID << "\n";
+    string updatedRecord = updatedRecordStream.str();
+
+    appointmentsFile.seekp(position);
+    appointmentsFile.write(updatedRecord.c_str(), updatedRecord.size());
+
+    cout << "Appointment record with ID " << appointmentID << " updated successfully.\n";
+}
+
 
 
 
