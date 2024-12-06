@@ -409,6 +409,62 @@ void updateAppointmentRecord(const string& appointmentID, const string& newAppoi
     cout << "Appointment record with ID " << appointmentID << " updated successfully.\n";
 }
 
+#include <regex>
+// Function to process and execute user queries using regex
+void processQuery(const string& query) {
+    // Regular expressions for query validation
+    regex selectAllFromDoctorsRegex(R"(SELECT\s+ALL\s+FROM\s+DOCTORS\s+WHERE\s+DOCTOR\s+ID\s*=\s*'(.*?)';)", regex::icase);
+    regex selectAllFromAppointmentsRegex(R"(SELECT\s+ALL\s+FROM\s+APPOINTMENTS\s+WHERE\s+DOCTOR\s+ID\s*=\s*'(.*?)';)", regex::icase);
+    regex selectDoctorNameFromDoctorsRegex(R"(SELECT\s+DOCTOR\s+NAME\s+FROM\s+DOCTORS\s+WHERE\s+DOCTOR\s+ID\s*=\s*'(.*?)';)", regex::icase);
+
+    smatch match;
+
+    // Check for "SELECT ALL FROM DOCTORS WHERE DOCTOR ID='xxx';"
+    if (regex_match(query, match, selectAllFromDoctorsRegex)) {
+        string doctorID = match[1].str();
+        try {
+            Doctor doctor = searchDoctorByID(doctorID);
+            cout << "Doctor ID: " << doctor.doctorID << "\n"
+                      << "Name: " << doctor.doctorName << "\n"
+                      << "Address: " << doctor.address << "\n";
+        } catch (const runtime_error& e) {
+            cout << "Error: " << e.what() << " for Doctor ID " << doctorID << "\n";
+        }
+        return;
+    }
+
+    // Check for "SELECT ALL FROM APPOINTMENTS WHERE DOCTOR ID='xxx';"
+    if (regex_match(query, match, selectAllFromAppointmentsRegex)) {
+        string doctorID = match[1].str();
+        try {
+            vector<streampos> positions = searchAppointmentsByDoctorID(doctorID);
+            for (const auto& pos : positions) {
+                Appointment appointment = readAppointmentRecord(pos);
+                cout << "Appointment ID: " << appointment.appointmentID << "\n"
+                          << "Date: " << appointment.appointmentDate << "\n"
+                          << "Doctor ID: " << appointment.doctorID << "\n";
+            }
+        } catch (const runtime_error& e) {
+            cout << "Error: " << e.what() << " for Doctor ID " << doctorID << "\n";
+        }
+        return;
+    }
+
+    // Check for "SELECT DOCTOR NAME FROM DOCTORS WHERE DOCTOR ID='xxx';"
+    if (regex_match(query, match, selectDoctorNameFromDoctorsRegex)) {
+        string doctorID = match[1].str();
+        try {
+            Doctor doctor = searchDoctorByID(doctorID);
+            cout << "Doctor Name: " << doctor.doctorName << "\n";
+        } catch (const runtime_error& e) {
+            cout << "Error: " << e.what() << " for Doctor ID " << doctorID << "\n";
+        }
+        return;
+    }
+
+    cout << "Invalid query format.\n";
+}
+
 
 
 

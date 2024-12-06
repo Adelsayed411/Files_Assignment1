@@ -37,4 +37,7 @@ void deleteAppointmentRecord(const string& appointmentID);
 void updateDoctorRecord(const string& doctorID, const string& newDoctorName, const string& newAddress);
 void updateAppointmentRecord(const string& appointmentID, const string& newAppointmentDate);
 
+// Query processing function
+void processQuery(const string& query);
+
 #endif // UNTITLED25_FILEMANAGER_H

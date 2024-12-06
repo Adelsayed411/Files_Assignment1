@@ -1,146 +1,198 @@
 #include <iostream>
 #include "FileManager.h"
+#include <string>
 #include <vector>
 #include <stdexcept>
 
-int main() {
-    // Open files for reading and writing
-    openFiles();
+void displayMenu() {
+    cout << "\nWelcome to the Doctor and Appointment Management System\n";
+    cout << "========================================\n";
+    cout << "1. Add New Doctor\n";
+    cout << "2. Add New Appointment\n";
+    cout << "3. Update Doctor Name (Doctor ID)\n";
+    cout << "4. Update Appointment Date (Appointment ID)\n";
+    cout << "5. Delete Appointment (Appointment ID)\n";
+    cout << "6. Delete Doctor (Doctor ID)\n";
+    cout << "7. Print Doctor Info (Doctor ID)\n";
+    cout << "8. Print Appointment Info (Appointment ID)\n";
+    cout << "9. Test Queries\n";
+    cout << "10. Exit\n";
+    cout << "========================================\n";
+    cout << "Please select an option: ";
+}
 
-    // Create and add new doctor records
-    Doctor doctors[] = {
-            {"D101", "Dr. jana", "123 Elm St"},
-            {"D102", "Dr. Baker", "456 Oak St"},
-            {"D103", "Dr. Carter", "789 Pine St"},
-            {"D104", "Dr. Davis", "101 Maple St"},
-            {"D105", "Dr. alia", "202 Cedar St"}
-    };
-    for (const auto& doc : doctors) {
-        try {
-            addDoctorRecord(doc);
-            cout << "Doctor " << doc.doctorID << " added successfully.\n";
-        } catch (const runtime_error& e) {
-            cout << "Error adding doctor " << doc.doctorID << ": " << e.what() << "\n";
-        }
-    }
+void handleAddDoctor() {
+    Doctor newDoctor;
+    cout << "Enter Doctor ID: ";
+    cin >> newDoctor.doctorID;
+    cin.ignore();
+    cout << "Enter Doctor Name: ";
+    cin >> newDoctor.doctorName;
+    cin.ignore();
+    cout << "Enter Doctor Address: ";
+    cin >> newDoctor.address;
+    cin.ignore();
 
-    // Create and add new appointment records
-    Appointment appointments[] = {
-            {"A101", "2024-12-10", "D101"},
-            {"A102", "2024-12-12", "D102"},
-            {"A103", "2024-12-14", "D103"},
-            {"A104", "2024-12-16", "D101"},
-            {"A105", "2024-12-18", "D104"},
-            {"A106", "2024-12-20", "D105"}
-    };
-    for (const auto& app : appointments) {
-        try {
-            addAppointmentRecord(app);
-            cout << "Appointment " << app.appointmentID << " added successfully.\n";
-        } catch (const runtime_error& e) {
-            cout << "Error adding appointment " << app.appointmentID << ": " << e.what() << "\n";
-        }
-    }
+    addDoctorRecord(newDoctor);
+    cout << "Doctor added successfully.\n";
+}
 
-    // Test deleting multiple doctor and appointment records
-    cout << "\nDeleting multiple doctor and appointment records:\n";
+void handleAddAppointment() {
+    Appointment newAppointment;
+    cout << "Enter Appointment ID: ";
+    cin >> newAppointment.appointmentID;
+    cin.ignore();
+    cout << "Enter Appointment Date: ";
+    cin >> newAppointment.appointmentDate;
+    cin.ignore();
+    cout << "Enter Doctor ID: ";
+    cin >> newAppointment.doctorID;
+    cin.ignore();
+
+    addAppointmentRecord(newAppointment);
+    cout << "Appointment added successfully.\n";
+}
+
+void handleUpdateDoctor() {
+    string doctorID, newDoctorName, newAddress;
+    cout << "Enter Doctor ID: ";
+    cin >> doctorID;
+    cin.ignore();
+    cout << "Enter New Doctor Name: ";
+    cin >> newDoctorName;
+    cin.ignore();
+    cout << "Enter New Address: ";
+    cin >> newAddress;
+    cin.ignore();
+
     try {
-        deleteDoctorRecord("D102");
-        cout << "Doctor D101 deleted successfully.\n";
-        deleteDoctorRecord("D105");
-        cout << "Doctor D103 deleted successfully.\n";
+        updateDoctorRecord(doctorID, newDoctorName, newAddress);
+        cout << "Doctor updated successfully.\n";
+    } catch (const runtime_error& e) {
+        cout << "Error updating doctor: " << e.what() << "\n";
+    }
+}
+
+void handleUpdateAppointment() {
+    string appointmentID, newDate;
+    cout << "Enter Appointment ID: ";
+    cin >> appointmentID;
+    cin.ignore();
+    cout << "Enter New Appointment Date: ";
+    cin >> newDate;
+    cin.ignore();
+
+    try {
+        updateAppointmentRecord(appointmentID, newDate);
+        cout << "Appointment updated successfully.\n";
+    } catch (const runtime_error& e) {
+        cout << "Error updating appointment: " << e.what() << "\n";
+    }
+}
+
+void handleDeleteDoctor() {
+    string doctorID;
+    cout << "Enter Doctor ID: ";
+    cin >> doctorID;
+    cin.ignore();
+
+    try {
+        deleteDoctorRecord(doctorID);
+        cout << "Doctor deleted successfully.\n";
     } catch (const runtime_error& e) {
         cout << "Error deleting doctor: " << e.what() << "\n";
     }
+}
+
+void handleDeleteAppointment() {
+    string appointmentID;
+    cout << "Enter Appointment ID: ";
+    cin >> appointmentID;
+    cin.ignore();
 
     try {
-        deleteAppointmentRecord("A102");
-        cout << "Appointment A102 deleted successfully.\n";
-        deleteAppointmentRecord("A105");
-        cout << "Appointment A105 deleted successfully.\n";
+        deleteAppointmentRecord(appointmentID);
+        cout << "Appointment deleted successfully.\n";
     } catch (const runtime_error& e) {
         cout << "Error deleting appointment: " << e.what() << "\n";
     }
+}
 
-    // Add new doctors and appointments after deletion to ensure best-fit strategy
-    cout << "\nAdding records after deletions:\n";
-    try {
-        Doctor newDoctor1 = {"D106", "Dr. malak", "303 Oakryy St"};
-        addDoctorRecord(newDoctor1);
-        cout << "Doctor " << newDoctor1.doctorID << " added successfully after deletion.\n";
-
-        Doctor newDoctor2 = {"D107", "Dr. tabark", "707 Cedar St"};
-        addDoctorRecord(newDoctor2);
-        cout << "Doctor " << newDoctor2.doctorID << " added successfully after deletion.\n";
-
-        Appointment newAppointment1 = {"A107", "2025-01-15", "D102"};
-        addAppointmentRecord(newAppointment1);
-        cout << "Appointment " << newAppointment1.appointmentID << " added successfully after deletion.\n";
-
-        Appointment newAppointment2 = {"A1088", "2025-01-20", "D105"};
-        addAppointmentRecord(newAppointment2);
-        cout << "Appointment " << newAppointment2.appointmentID << " added successfully after deletion.\n";
-    } catch (const runtime_error& e) {
-        cout << "Error adding new record: " << e.what() << "\n";
-    }
-
-    // Test updating a doctor's record
-    cout << "\nUpdating doctor records:\n";
-    try {
-        updateDoctorRecord("D103", "Dr. farhaa", "456 onmr St");
-        cout << "Doctor D102 updated successfully.\n";
-    } catch (const runtime_error& e) {
-        cout << "Error updating doctor D102: " << e.what() << "\n";
-    }
+void handlePrintDoctorInfo() {
+    string doctorID;
+    cout << "Enter Doctor ID: ";
+    cin >> doctorID;
+    cin.ignore();
 
     try {
-        updateDoctorRecord("D104", "Dr. Foster", "303 cvrt St");
-        cout << "Doctor D106 updated successfully.\n";
+        Doctor doctor = searchDoctorByID(doctorID);
+        cout << "Doctor ID: " << doctor.doctorID << "\n"
+                  << "Name: " << doctor.doctorName << "\n"
+                  << "Address: " << doctor.address << "\n";
     } catch (const runtime_error& e) {
-        cout << "Error updating doctor D106: " << e.what() << "\n";
+        cout << "Error: " << e.what() << "\n";
     }
+}
 
-    // Test updating an appointment's record
-    cout << "\nUpdating appointment records:\n";
+void handlePrintAppointmentInfo() {
+    string appointmentID;
+    cout << "Enter Appointment ID: ";
+    cin >> appointmentID;
+    cin.ignore();
+
     try {
-        updateAppointmentRecord("A104", "2025-01-01");
-        cout << "Appointment A104 updated successfully.\n";
+        Appointment appointment = searchAppointmentByID(appointmentID);
+        cout << "Appointment ID: " << appointment.appointmentID << "\n"
+                  << "Date: " << appointment.appointmentDate << "\n"
+                  << "Doctor ID: " << appointment.doctorID << "\n";
     } catch (const runtime_error& e) {
-        cout << "Error updating appointment A104: " << e.what() << "\n";
+        cout << "Error: " << e.what() << "\n";
     }
+}
 
-    try {
-        updateAppointmentRecord("A108", "2025-02-01");
-        cout << "Appointment A108 updated successfully.\n";
-    } catch (const runtime_error& e) {
-        cout << "Error updating appointment A108: " << e.what() << "\n";
-    }
+void handleTestQueries() {
+    cout << "\nTesting predefined queries:\n";
 
-    // Verify the content of avail lists
-    cout << "\nVerifying the avail list content:\n";
-    ifstream availListFile("doctorAvailList.txt");
-    if (availListFile.is_open()) {
-        string line;
-        while (getline(availListFile, line)) {
-            cout << "Doctor Avail List Entry: " << line << "\n";
+    // Query to select all from Doctors where Doctor ID='D101'
+    string query1 = "SELECT ALL FROM DOCTORS WHERE DOCTOR ID='D101';";
+    cout << "\nQuery: " << query1 << "\n";
+    processQuery(query1);
+
+    // Query to select all from Appointments where Doctor ID='D101'
+    string query2 = "SELECT ALL FROM APPOINTMENTS WHERE DOCTOR ID='D101';";
+    cout << "\nQuery: " << query2 << "\n";
+    processQuery(query2);
+
+    // Query to select Doctor Name from Doctors where Doctor ID='D102'
+    string query3 = "SELECT DOCTOR NAME FROM DOCTORS WHERE DOCTOR ID='D102';";
+    cout << "\nQuery: " << query3 << "\n";
+    processQuery(query3);
+}
+
+int main() {
+    openFiles();
+    int choice;
+
+    do {
+        displayMenu();
+        cin >> choice;
+        cin.ignore();
+
+        switch (choice) {
+            case 1: handleAddDoctor(); break;
+            case 2: handleAddAppointment(); break;
+            case 3: handleUpdateDoctor(); break;
+            case 4: handleUpdateAppointment(); break;
+            case 5: handleDeleteAppointment(); break;
+            case 6: handleDeleteDoctor(); break;
+            case 7: handlePrintDoctorInfo(); break;
+            case 8: handlePrintAppointmentInfo(); break;
+            case 9: handleTestQueries(); break;
+            case 10: cout << "Exiting the program.\n"; break;
+            default: cout << "Invalid choice. Please try again.\n"; break;
         }
-        availListFile.close();
-    } else {
-        cout << "Unable to open doctor avail list file for verification.\n";
-    }
+    } while (choice != 10);
 
-    availListFile.open("appointmentAvailList.txt");
-    if (availListFile.is_open()) {
-        string line;
-        while (getline(availListFile, line)) {
-            cout << "Appointment Avail List Entry: " << line << "\n";
-        }
-        availListFile.close();
-    } else {
-        cout << "Unable to open appointment avail list file for verification.\n";
-    }
-
-    // Close the files after operations
     closeFiles();
     return 0;
 }
