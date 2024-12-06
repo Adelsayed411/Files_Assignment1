@@ -18,9 +18,9 @@ int main() {
     for (const auto& doc : doctors) {
         try {
             addDoctorRecord(doc);
-            std::cout << "Doctor " << doc.doctorID << " added successfully.\n";
-        } catch (const std::runtime_error& e) {
-            std::cout << "Error adding doctor " << doc.doctorID << ": " << e.what() << "\n";
+            cout << "Doctor " << doc.doctorID << " added successfully.\n";
+        } catch (const runtime_error& e) {
+            cout << "Error adding doctor " << doc.doctorID << ": " << e.what() << "\n";
         }
     }
 
@@ -36,114 +36,114 @@ int main() {
     for (const auto& app : appointments) {
         try {
             addAppointmentRecord(app);
-            std::cout << "Appointment " << app.appointmentID << " added successfully.\n";
-        } catch (const std::runtime_error& e) {
-            std::cout << "Error adding appointment " << app.appointmentID << ": " << e.what() << "\n";
+            cout << "Appointment " << app.appointmentID << " added successfully.\n";
+        } catch (const runtime_error& e) {
+            cout << "Error adding appointment " << app.appointmentID << ": " << e.what() << "\n";
         }
     }
 
     // Test searching for doctors by ID
-    std::cout << "\nSearching for doctors by ID:\n";
+    cout << "\nSearching for doctors by ID:\n";
     for (const auto& doctorID : {"D101", "D102", "D103", "D104", "D105", "D106"}) {
         try {
             Doctor foundDoc = searchDoctorByID(doctorID);
-            std::cout << "Doctor ID: " << foundDoc.doctorID << "\n"
+            cout << "Doctor ID: " << foundDoc.doctorID << "\n"
                       << "Name: " << foundDoc.doctorName << "\n"
                       << "Address: " << foundDoc.address << "\n";
-        } catch (const std::runtime_error& e) {
-            std::cout << "Error: " << e.what() << " for Doctor ID " << doctorID << "\n";
+        } catch (const runtime_error& e) {
+            cout << "Error: " << e.what() << " for Doctor ID " << doctorID << "\n";
         }
     }
 
     // Test searching for appointments by ID
-    std::cout << "\nSearching for appointments by ID:\n";
+    cout << "\nSearching for appointments by ID:\n";
     for (const auto& appointmentID : {"A101", "A102", "A103", "A104", "A105", "A106", "A107"}) {
         try {
             Appointment foundApp = searchAppointmentByID(appointmentID);
-            std::cout << "Appointment ID: " << foundApp.appointmentID << "\n"
+            cout << "Appointment ID: " << foundApp.appointmentID << "\n"
                       << "Date: " << foundApp.appointmentDate << "\n"
                       << "Doctor ID: " << foundApp.doctorID << "\n";
-        } catch (const std::runtime_error& e) {
-            std::cout << "Error: " << e.what() << " for Appointment ID " << appointmentID << "\n";
+        } catch (const runtime_error& e) {
+            cout << "Error: " << e.what() << " for Appointment ID " << appointmentID << "\n";
         }
     }
 
     // Test searching for doctors by name
-    std::cout << "\nSearching for doctors by name:\n";
+    cout << "\nSearching for doctors by name:\n";
     for (const auto& doctorName : {"Dr. Adams", "Dr. Baker", "Dr. Carter", "Dr. Davis", "Dr. Evans", "Dr. Foster"}) {
         try {
-            std::vector<std::streampos> positions = searchDoctorByName(doctorName);
+            vector<streampos> positions = searchDoctorByName(doctorName);
             if (!positions.empty()) {
-                std::cout << "Doctors with name " << doctorName << ":\n";
+                cout << "Doctors with name " << doctorName << ":\n";
                 for (const auto& pos : positions) {
                     Doctor doc = readDoctorRecord(pos);
-                    std::cout << "Doctor ID: " << doc.doctorID << "\n"
+                    cout << "Doctor ID: " << doc.doctorID << "\n"
                               << "Name: " << doc.doctorName << "\n"
                               << "Address: " << doc.address << "\n";
                 }
             } else {
-                std::cout << "No doctors found with name " << doctorName << "\n";
+                cout << "No doctors found with name " << doctorName << "\n";
             }
-        } catch (const std::runtime_error& e) {
-            std::cout << "Error: " << e.what() << " for Doctor Name " << doctorName << "\n";
+        } catch (const runtime_error& e) {
+            cout << "Error: " << e.what() << " for Doctor Name " << doctorName << "\n";
         }
     }
 
     // Test searching for appointments by doctor ID
-    std::cout << "\nSearching for appointments by doctor ID:\n";
+    cout << "\nSearching for appointments by doctor ID:\n";
     for (const auto& doctorID : {"D101", "D102", "D103", "D104", "D105", "D106"}) {
         try {
-            std::vector<std::streampos> positions = searchAppointmentsByDoctorID(doctorID);
+            vector<streampos> positions = searchAppointmentsByDoctorID(doctorID);
             if (!positions.empty()) {
-                std::cout << "Appointments for Doctor ID " << doctorID << ":\n";
+                cout << "Appointments for Doctor ID " << doctorID << ":\n";
                 for (const auto& pos : positions) {
                     Appointment app = readAppointmentRecord(pos);
-                    std::cout << "Appointment ID: " << app.appointmentID << "\n"
+                    cout << "Appointment ID: " << app.appointmentID << "\n"
                               << "Date: " << app.appointmentDate << "\n"
                               << "Doctor ID: " << app.doctorID << "\n";
                 }
             } else {
-                std::cout << "No appointments found for Doctor ID " << doctorID << "\n";
+                cout << "No appointments found for Doctor ID " << doctorID << "\n";
             }
-        } catch (const std::runtime_error& e) {
-            std::cout << "Error: " << e.what() << " for Doctor ID " << doctorID << "\n";
+        } catch (const runtime_error& e) {
+            cout << "Error: " << e.what() << " for Doctor ID " << doctorID << "\n";
         }
     }
 
     // Test deleting multiple doctor and appointment records
-    std::cout << "\nDeleting multiple doctor and appointment records:\n";
+    cout << "\nDeleting multiple doctor and appointment records:\n";
     try {
         deleteDoctorRecord("D101");
-        std::cout << "Doctor D101 deleted successfully.\n";
+        cout << "Doctor D101 deleted successfully.\n";
         deleteDoctorRecord("D103");
-        std::cout << "Doctor D103 deleted successfully.\n";
-    } catch (const std::runtime_error& e) {
-        std::cout << "Error deleting doctor: " << e.what() << "\n";
+        cout << "Doctor D103 deleted successfully.\n";
+    } catch (const runtime_error& e) {
+        cout << "Error deleting doctor: " << e.what() << "\n";
     }
 
     try {
         deleteAppointmentRecord("A102");
-        std::cout << "Appointment A102 deleted successfully.\n";
+        cout << "Appointment A102 deleted successfully.\n";
         deleteAppointmentRecord("A105");
-        std::cout << "Appointment A105 deleted successfully.\n";
-    } catch (const std::runtime_error& e) {
-        std::cout << "Error deleting appointment: " << e.what() << "\n";
+        cout << "Appointment A105 deleted successfully.\n";
+    } catch (const runtime_error& e) {
+        cout << "Error deleting appointment: " << e.what() << "\n";
     }
 
     Doctor newDoctor = {"D106", "Dr. Foste", "303 Bir St"};
     try {
         addDoctorRecord(newDoctor);
-        std::cout << "\nDoctor " << newDoctor.doctorID << " added successfully after deletion.\n";
-    } catch (const std::runtime_error& e) {
-        std::cout << "Error adding doctor " << newDoctor.doctorID << ": " << e.what() << "\n";
+        cout << "\nDoctor " << newDoctor.doctorID << " added successfully after deletion.\n";
+    } catch (const runtime_error& e) {
+        cout << "Error adding doctor " << newDoctor.doctorID << ": " << e.what() << "\n";
     }
 
     try {
 
         deleteDoctorRecord("D104");
-        std::cout << "Doctor D103 deleted successfully.\n";
-    } catch (const std::runtime_error& e) {
-        std::cout << "Error deleting doctor: " << e.what() << "\n";
+        cout << "Doctor D103 deleted successfully.\n";
+    } catch (const runtime_error& e) {
+        cout << "Error deleting doctor: " << e.what() << "\n";
     }
 
     // Close the files after operations

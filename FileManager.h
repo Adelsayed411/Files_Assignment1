@@ -28,8 +28,6 @@ vector<streampos> searchAppointmentsByDoctorID(const string& doctorID);
 void addDoctorRecord(const Doctor& doctor);
 void addAppointmentRecord(const Appointment& appointment);
 
-
-
 // Delete functions
 void deleteDoctorRecord(const string& doctorID);
 void deleteAppointmentRecord(const string& appointmentID);

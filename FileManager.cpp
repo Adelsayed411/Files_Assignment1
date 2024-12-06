@@ -163,208 +163,169 @@ vector<streampos> searchAppointmentsByDoctorID(const string& doctorID) {
 
 #include <stdexcept>
 
-// Flag to track if the first deletion has occurred
 bool firstDoctorDeletion = true;
 bool firstAppointmentDeletion = true;
 
-// Function to delete a doctor record and update the index and avail list
-void deleteDoctorRecord(const std::string& doctorID) {
+void deleteDoctorRecord(const string& doctorID) {
     const auto& doctorPrimaryIndex = IndexManager::getDoctorPrimaryIndex();
     auto it = doctorPrimaryIndex.find(doctorID);
     if (it != doctorPrimaryIndex.end()) {
-        std::streampos position = it->second;
+        streampos position = it->second;
 
-        // Calculate the size of the record
         doctorsFile.seekg(position);
-        std::string record;
-        std::getline(doctorsFile, record);
-        size_t size = record.size() + 1;  // Include newline character
+        string record;
+        getline(doctorsFile, record);
+        size_t size = record.size() + 1;
 
-        // Mark the record as deleted in the data file
         doctorsFile.seekp(position);
         if (firstDoctorDeletion) {
-            doctorsFile << "*-1\n";  // Marking the first deleted record
+            doctorsFile << "*-1\n";  
             firstDoctorDeletion = false;
         } else {
-            doctorsFile << "*" << position << "\n";  // Mark subsequent deletions with offset
+            doctorsFile << "*" << position << "\n"; 
         }
 
-        // Remove from indexes and add to avail list
         IndexManager::removeDoctorFromIndexFile(doctorID);
         IndexManager::addToAvailList("doctor", position, size);
 
-        std::cout << "Doctor record with ID " << doctorID << " marked as deleted.\n";
+        cout << "Doctor record with ID " << doctorID << " marked as deleted.\n";
     } else {
-        std::cout << "Doctor ID " << doctorID << " not found.\n";
+        cout << "Doctor ID " << doctorID << " not found.\n";
     }
 }
 
-// Function to delete an appointment record and update the index and avail list
-void deleteAppointmentRecord(const std::string& appointmentID) {
+void deleteAppointmentRecord(const string& appointmentID) {
     const auto& appointmentPrimaryIndex = IndexManager::getAppointmentPrimaryIndex();
     auto it = appointmentPrimaryIndex.find(appointmentID);
     if (it != appointmentPrimaryIndex.end()) {
-        std::streampos position = it->second;
+        streampos position = it->second;
 
-        // Calculate the size of the record
         appointmentsFile.seekg(position);
-        std::string record;
-        std::getline(appointmentsFile, record);
-        size_t size = record.size() + 1;  // Include newline character
+        string record;
+        getline(appointmentsFile, record);
+        size_t size = record.size() + 1;  
 
-        // Mark the record as deleted in the data file
         appointmentsFile.seekp(position);
         if (firstAppointmentDeletion) {
-            appointmentsFile << "*-1\n";  // Marking the first deleted record
+            appointmentsFile << "*-1\n";
             firstAppointmentDeletion = false;
         } else {
-            appointmentsFile << "*" << position << "\n";  // Mark subsequent deletions with offset
+            appointmentsFile << "*" << position << "\n";  
         }
 
-        // Remove from indexes and add to avail list
         IndexManager::removeAppointmentFromIndexFile(appointmentID);
         IndexManager::addToAvailList("appointment", position, size);
 
-        std::cout << "Appointment record with ID " << appointmentID << " marked as deleted.\n";
+        cout << "Appointment record with ID " << appointmentID << " marked as deleted.\n";
     } else {
-        std::cout << "Appointment ID " << appointmentID << " not found.\n";
+        cout << "Appointment ID " << appointmentID << " not found.\n";
     }
 }
 
 
 #include <algorithm>
 
-
 // Function to add a doctor record with best-fit placement strategy
 void addDoctorRecord(const Doctor& doctor) {
-    // Check for duplicate primary key
     const auto& doctorPrimaryIndex = IndexManager::getDoctorPrimaryIndex();
     if (doctorPrimaryIndex.find(doctor.doctorID) != doctorPrimaryIndex.end()) {
-        throw std::runtime_error("Duplicate Doctor ID is not allowed: " + std::string(doctor.doctorID));
+        throw runtime_error("Duplicate Doctor ID is not allowed: " + string(doctor.doctorID));
     }
 
-    // Serialize the record into a string
-    std::ostringstream recordStream;
+    ostringstream recordStream;
     recordStream << doctor.doctorID << "|" << doctor.doctorName << "|" << doctor.address << "\n";
-    std::string record = recordStream.str();
+    string record = recordStream.str();
     size_t recordSize = record.size();
 
-    // Sort the avail list by size (ascending order)
-    auto availList = IndexManager::getAvailList("doctor");
-    std::sort(availList.begin(), availList.end(), [](const auto& a, const auto& b) {
-        return a.second < b.second; // Sort by size
+    auto& availList = IndexManager::doctorAvailList; 
+    sort(availList.begin(), availList.end(), [](const auto& a, const auto& b) {
+        return a.second < b.second; 
     });
 
-    std::streampos position;
+    streampos position;
     bool recordPlaced = false;
 
-    // Find the best-fit slot
     for (auto it = availList.begin(); it != availList.end(); ++it) {
         if (it->second >= recordSize) {
-            // Suitable slot found
+      
             position = it->first;
-
-            // Write the record to the file
             doctorsFile.seekp(position);
             doctorsFile.write(record.c_str(), recordSize);
 
-            // Update the avail list and remove the used slot
-            size_t remainingSize = it->second - recordSize;
             availList.erase(it);
-            if (remainingSize > 0) {
-                availList.push_back({position + static_cast<std::streamoff>(recordSize), remainingSize});
-            }
             recordPlaced = true;
             break;
         }
     }
 
-    // If no suitable slot is found, append at the end of the file
     if (!recordPlaced) {
-        doctorsFile.seekp(0, std::ios::end);
+        doctorsFile.seekp(0, ios::end);
         position = doctorsFile.tellp();
         doctorsFile.write(record.c_str(), recordSize);
     }
 
-    // Update the index
     IndexManager::addDoctorToIndexFile(doctor, position);
 
-    // Mark the last deleted record as *-1 if it remains
     if (availList.size() == 1) {
         auto lastDeleted = availList.front();
         doctorsFile.seekp(lastDeleted.first);
         doctorsFile << "*-1\n";
     }
 
-    // Write back the updated avail list
     IndexManager::writeAvailListFiles();
 }
 
 // Function to add an appointment record with best-fit placement strategy
 void addAppointmentRecord(const Appointment& appointment) {
-    // Check for duplicate primary key
+ 
     const auto& appointmentPrimaryIndex = IndexManager::getAppointmentPrimaryIndex();
     if (appointmentPrimaryIndex.find(appointment.appointmentID) != appointmentPrimaryIndex.end()) {
-        throw std::runtime_error("Duplicate Appointment ID is not allowed: " + std::string(appointment.appointmentID));
+        throw runtime_error("Duplicate Appointment ID is not allowed: " + string(appointment.appointmentID));
     }
 
-    // Serialize the record into a string
-    std::ostringstream recordStream;
+    ostringstream recordStream;
     recordStream << appointment.appointmentID << "|" << appointment.appointmentDate << "|" << appointment.doctorID << "\n";
-    std::string record = recordStream.str();
+    string record = recordStream.str();
     size_t recordSize = record.size();
 
-    // Sort the avail list by size (ascending order)
-    auto availList = IndexManager::getAvailList("appointment");
-    std::sort(availList.begin(), availList.end(), [](const auto& a, const auto& b) {
-        return a.second < b.second; // Sort by size
+    auto& availList = IndexManager::appointmentAvailList; 
+    sort(availList.begin(), availList.end(), [](const auto& a, const auto& b) {
+        return a.second < b.second; 
     });
 
-    std::streampos position;
+    streampos position;
     bool recordPlaced = false;
 
-    // Find the best-fit slot
     for (auto it = availList.begin(); it != availList.end(); ++it) {
         if (it->second >= recordSize) {
-            // Suitable slot found
+           
             position = it->first;
 
-            // Write the record to the file
             appointmentsFile.seekp(position);
             appointmentsFile.write(record.c_str(), recordSize);
 
-            // Update the avail list and remove the used slot
-            size_t remainingSize = it->second - recordSize;
             availList.erase(it);
-            if (remainingSize > 0) {
-                availList.push_back({position + static_cast<std::streamoff>(recordSize), remainingSize});
-            }
             recordPlaced = true;
             break;
         }
     }
 
-    // If no suitable slot is found, append at the end of the file
     if (!recordPlaced) {
-        appointmentsFile.seekp(0, std::ios::end);
+        appointmentsFile.seekp(0, ios::end);
         position = appointmentsFile.tellp();
         appointmentsFile.write(record.c_str(), recordSize);
     }
 
-    // Update the index
     IndexManager::addAppointmentToIndexFile(appointment, position);
 
-    // Mark the last deleted record as *-1 if it remains
     if (availList.size() == 1) {
         auto lastDeleted = availList.front();
         appointmentsFile.seekp(lastDeleted.first);
         appointmentsFile << "*-1\n";
     }
 
-    // Write back the updated avail list
     IndexManager::writeAvailListFiles();
 }
-
 
 
 
